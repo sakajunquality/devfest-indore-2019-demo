@@ -3,11 +3,18 @@ FROM alpine as alpine-base
 
 FROM golang-base as build
 RUN apk add alpine-sdk
-WORKDIR $GOPATH/src/github.com/sakajunquality/devfest-indore-2019-demo/app
+
+RUN mkdir /app
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod download
+
 COPY . .
 
-RUN go get -d -v ./...
-RUN go install -v ./...
+RUN go build -o /go/bin/app
 
 FROM alpine-base
 RUN apk add --no-cache ca-certificates curl \
